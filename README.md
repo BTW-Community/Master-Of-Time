@@ -27,6 +27,8 @@ To use this addon you needs to use commands:
 
 You can also use the keybind "R" to reset the world speed in case you can't type in the chat
 
+(BEWARE: this addon can cause freezes, and bugs. Please report it in the BtW discord server at the Master Of Time addon showcase channel if you have any issue)
+
 ## License
 
 This addon is under the CC-BY 4.0 license.
