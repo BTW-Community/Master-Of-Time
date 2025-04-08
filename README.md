@@ -17,7 +17,7 @@ It's *possible* to use it in gameplay but at **your own risk** !
 
 ## How to use
 
-The closest you get to the extremes in term of speed (very low or very high speed) the less stable and more difficult it is to interact with the world, to counteract the movement issues, **i heavily recommend  using**  to move around with "less" impact on the movement (the slower the speed the longer you have to press a movement button to actually work)
+The closest you get to the extremes in term of speed (very low or very high speed) the less stable and more difficult it is to interact with the world, to counteract the movement issues, **i heavily recommend  using** the freecam addon (found in the discord server by wwwday)  to move around with "less" impact on the movement (the slower the speed the longer you have to press a movement button to actually work)
 
 To use this addon you needs to use commands:
 - "/worldspeed set {number}" : let you decide which speed you want your game to run at
@@ -26,6 +26,8 @@ To use this addon you needs to use commands:
 - "/worldspeed maxpspeedtest" : let you know the highest speed your pc could handle (can vary a lot depending on a lot of factor so it should be taken lightly, but it's a good indicator to know around which value your game can run)
 
 You can also use the keybind "R" to reset the world speed in case you can't type in the chat
+
+(BEWARE: this addon can cause freezes, and bugs. Please report it in the BtW discord server at the Master Of Time addon showcase channel if you have any issue)
 
 ## License
 
