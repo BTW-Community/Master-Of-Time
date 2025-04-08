@@ -1,0 +1,119 @@
+package net.dravigen.time_master;
+
+import btw.AddonHandler;
+import btw.BTWAddon;
+import net.minecraft.src.*;
+import org.lwjgl.input.Keyboard;
+import java.util.List;
+
+public class TimeMasterAddon extends BTWAddon {
+
+    public static KeyBinding reset_time_speed_key;
+    public static float worldSpeedModifier = 1F;
+    public static boolean warned= false;
+    public static boolean currentSpeedTest = false;
+    public static boolean maxSpeedTest = false;
+
+    public TimeMasterAddon() {
+        super();
+    }
+
+    @Override
+    public void initialize() {
+        AddonHandler.logMessage(this.getName() + " Version " + this.getVersionString() + " Initializing...");
+        createNewCommand();
+        initKeybind();
+    }
+
+    private void createNewCommand() {
+        registerAddonCommand(new CommandBase() {
+            @Override
+            public String getCommandName() {
+                return "worldspeed";
+            }
+
+            @Override
+            public String getCommandUsage(ICommandSender iCommandSender) {
+                return "/worldspeed <set/<reset>/<speedtest>/<maxspeedtest>, speedModifier>";
+            }
+            @Override
+            public List addTabCompletionOptions(ICommandSender par1ICommandSender, String[] par2ArrayOfStr) {
+                if (par2ArrayOfStr.length==1){
+                    return getListOfStringsMatchingLastWord(par2ArrayOfStr, new String[]{"set","reset","speedtest", "maxspeedtest"} );
+                }
+                return null;
+            }
+            @Override
+            public void processCommand(ICommandSender iCommandSender, String[] strings) {
+                if (strings[0].equals("set")){
+                    try {
+                        float speedModifier = Float.parseFloat(strings[1]);
+                        if (speedModifier>250){
+                            speedModifier=250;
+                            worldSpeedModifier = speedModifier;
+                            iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("Your value was too high ! The world speed got forcefully set to the maximum value: 250x"));
+                        }else if (speedModifier<0.05F){
+                            speedModifier=0.05F;
+                            worldSpeedModifier = speedModifier;
+                            iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("Your value was too low ! The world speed got forcefully set to the minimum value: 0.05x"));
+                        }else {
+                            worldSpeedModifier = speedModifier;
+                            iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("The world speed got set to " + speedModifier+"x"));
+                        }
+                        if (speedModifier<0.25&&!warned){
+                            iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("-----------------------"));
+                            iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("   WARNING MESSAGE !"));
+                            iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("Slowing down the world further than 0.25 can have unexpected results, beware !"));
+                            iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("-----------------------"));
+
+                            warned=true;
+                        }
+
+                    }catch (NumberFormatException e){
+                        throw new WrongUsageException("Invalid command.");
+                    }
+                } else if (strings[0].equals("reset")) {
+                    try {
+                        worldSpeedModifier = 1.0F;
+                        iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("The world speed got reset"));
+                    } catch (NumberFormatException e) {
+                        throw new WrongUsageException("Invalid command.");
+
+                    }
+                } else if (strings[0].equals("speedtest")) {
+                    try {
+                        currentSpeedTest = true;
+                        iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText(" "));
+                        iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("Testing the current speed of your game, it will take 5 secs..."));
+                        iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("--------------------------------------"));
+                        iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("DON'T PAUSE THE GAME DURING THE PROCESS !"));
+                        iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("--------------------------------------"));
+                    } catch (NumberFormatException e) {
+                        throw new WrongUsageException("Invalid command.");
+
+                    }
+                }else if (strings[0].equals("maxspeedtest")) {
+                    try {
+                        worldSpeedModifier = 500F;
+                        currentSpeedTest = true;
+                        maxSpeedTest = true;
+                        iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText(" "));
+                        iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("Testing the highest speed your pc could handle, it will take 25 secs..."));
+                        iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("--------------------------------------"));
+                        iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("DON'T PAUSE THE GAME DURING THE PROCESS !"));
+                        iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("--------------------------------------"));
+                    } catch (NumberFormatException e) {
+                        throw new WrongUsageException("Invalid command.");
+
+                    }
+                }
+            }
+        });
+    }
+
+    public void initKeybind(){
+        reset_time_speed_key = new KeyBinding(StatCollector.translateToLocal("Reset World Speed"), Keyboard.KEY_R);
+    }
+}
+
+

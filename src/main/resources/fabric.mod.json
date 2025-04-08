@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "timemaster",
+  "version": "${version}",
+  "name": "Master Of Time",
+  "description": "Lets you control the flow of time",
+  "authors": [
+    "DraViGen"
+  ],
+  "contact": {
+    "homepage": "",
+    "sources": ""
+  },
+  "license": "CC-BY 4.0",
+  "icon": "assets/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.dravigen.time_master.TimeMasterMod"
+    ],
+    "btw:addon": [
+      "net.dravigen.time_master.TimeMasterAddon"
+    ]
+  },
+  "custom": {
+    "btw:addon_prefix": "EX"
+  },
+  "mixins": [
+    "time_master.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.19",
+    "minecraft": "1.6.4"
+  }
+}

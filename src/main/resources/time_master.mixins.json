@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.dravigen.time_master.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "GameSettingsMixin",
+    "MinecraftServerMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
