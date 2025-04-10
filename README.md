@@ -32,3 +32,4 @@ You can also use the keybind "R" to reset the world speed in case you can't type
 ## License
 
 This addon is under the CC-BY 4.0 license.
+(https://creativecommons.org/licenses/by/4.0/deed.en)
