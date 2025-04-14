@@ -19,6 +19,11 @@ public abstract class MinecraftServerMixin {
     private long prevTime=-1;
     @Unique
     private long prevTick=-1;
+    @Unique
+    private boolean iKeyPressed = false;
+    @Unique
+    private boolean dKeyPressed = false;
+
 
 
     @Redirect(method = "sendTimerSpeedUpdate(F)V", at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(FF)F"),remap = false)
@@ -38,6 +43,16 @@ public abstract class MinecraftServerMixin {
 
             return speedModifier;
         }
+        if(TimeMasterAddon.increase_time_speed_key.isPressed()&&!iKeyPressed&&!TimeMasterAddon.decrease_time_speed_key.isPressed()){
+            iKeyPressed=true;
+            TimeMasterAddon.worldSpeedModifier = worldServers[0].getData(TimeMasterAddon.INCREASE_VALUE);
+            this.getConfigurationManager().sendPacketToAllPlayers(new Packet3Chat(ChatMessageComponent.createFromText("World speed got set to " + TimeMasterAddon.worldSpeedModifier + "x")));
+        }else iKeyPressed=false;
+        if(TimeMasterAddon.decrease_time_speed_key.isPressed()&&!dKeyPressed){
+            dKeyPressed=true;
+            TimeMasterAddon.worldSpeedModifier = worldServers[0].getData(TimeMasterAddon.DECREASE_VALUE);
+            this.getConfigurationManager().sendPacketToAllPlayers(new Packet3Chat(ChatMessageComponent.createFromText("World speed got set to " + TimeMasterAddon.worldSpeedModifier + "x")));
+        }else dKeyPressed=false;
         if (TimeMasterAddon.worldSpeedModifier != 1F) {
             speedModifier = TimeMasterAddon.worldSpeedModifier;
         }
