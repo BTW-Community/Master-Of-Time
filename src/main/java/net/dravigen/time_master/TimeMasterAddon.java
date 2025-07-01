@@ -41,8 +41,8 @@ public class TimeMasterAddon extends BTWAddon {
     }
 
     public static class TMChannel {
-        public static final String CLIENT_TO_SERVER_CHANNEL = "T-M:C2S";
-        public static final String SERVER_TO_CLIENT_CHANNEL = "T-M:S2C";
+        public static final String CLIENT_TO_SERVER_CHANNEL = "MoT:C2S";
+        public static final String SERVER_TO_CLIENT_CHANNEL = "MoT:S2C";
     }
 
 

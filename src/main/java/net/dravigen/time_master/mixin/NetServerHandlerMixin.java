@@ -16,7 +16,7 @@ public class NetServerHandlerMixin {
     @Shadow public EntityPlayerMP playerEntity;
 
     @Inject(method = "handleCustomPayload", at = @At("HEAD"), cancellable = true)
-    private void tm_onCustomPayloadC2S(Packet250CustomPayload packet, CallbackInfo ci) {
+    private void mot_onCustomPayloadC2S(Packet250CustomPayload packet, CallbackInfo ci) {
         if (packet.channel.equals(TimeMasterAddon.TMChannel.CLIENT_TO_SERVER_CHANNEL)) {
             PacketHandlerC2S.handle(packet, this.playerEntity);
             ci.cancel();

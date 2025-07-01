@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class NetClientHandlerMixin {
 
     @Inject(method = "handleCustomPayload", at = @At("HEAD"), cancellable = true)
-    private void tm_onCustomPayloadS2C(Packet250CustomPayload packet, CallbackInfo ci) {
+    private void mot_onCustomPayloadS2C(Packet250CustomPayload packet, CallbackInfo ci) {
         if (packet.channel.equals(TimeMasterAddon.TMChannel.SERVER_TO_CLIENT_CHANNEL)) {
             PacketHandlerS2C.handle(packet);
             ci.cancel();
