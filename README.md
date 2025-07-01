@@ -23,7 +23,7 @@ To use this addon you needs to use commands:
 - "/timemaster set {number}" : let you decide which speed you want your game to run at
 - "/timemaster reset" : reset the world speed at 1x
 - "/timemaster speedtest" : let you know the current speed of the game (the higher the speed the less accurate it is)
-- "/timemaster maxpspeedtest" : let you know the highest speed your pc could handle (can vary a lot depending on a lot of factor so it should be taken lightly, but it's a good indicator to know around which value your game can run)
+- "/timemaster maxspeedtest" : let you know the highest speed your pc could handle (can vary a lot depending on a lot of factor so it should be taken lightly, but it's a good indicator to know around which value your game can run)
 - "/timemaster keybinds <increasevalue/decreasevalue>" : let you decide the value at which the world speed will be set when the associated keybind is pressed
 
 Keybinds:
