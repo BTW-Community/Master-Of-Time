@@ -18,6 +18,7 @@ public class TimeMasterAddon extends BTWAddon {
     public static boolean warned= false;
     public static boolean currentSpeedTest = false;
     public static boolean maxSpeedTest = false;
+    public static double tps;
 
     public static DataEntry<Float> INCREASE_VALUE = DataProvider.getBuilder(float.class)
             .global()
@@ -39,11 +40,19 @@ public class TimeMasterAddon extends BTWAddon {
         super();
     }
 
+    public static class TMChannel {
+        public static final String CLIENT_TO_SERVER_CHANNEL = "T-M:C2S";
+        public static final String SERVER_TO_CLIENT_CHANNEL = "T-M:S2C";
+    }
+
+
     @Override
     public void initialize() {
         AddonHandler.logMessage(this.getName() + " Version " + this.getVersionString() + " Initializing...");
         createNewCommand();
-        initKeybind();
+        if (!MinecraftServer.getIsServer()) {
+            initKeybind();
+        }
     }
 
     private void createNewCommand() {
@@ -57,12 +66,13 @@ public class TimeMasterAddon extends BTWAddon {
             public String getCommandUsage(ICommandSender iCommandSender) {
                 return "/timemaster <set/<reset>/<speedtest>/<maxspeedtest>/<keybindsvalue, <increasevalue, value>/<decreasevalue, value>>, speedModifier>";
             }
+            @SuppressWarnings("rawtypes")
             @Override
             public List addTabCompletionOptions(ICommandSender par1ICommandSender, String[] par2ArrayOfStr) {
                 if (par2ArrayOfStr.length==1){
-                    return getListOfStringsMatchingLastWord(par2ArrayOfStr, new String[]{"set","reset","speedtest", "maxspeedtest", "keybindsvalue"} );
+                    return getListOfStringsMatchingLastWord(par2ArrayOfStr, "set","reset","speedtest", "maxspeedtest", "keybindsvalue" );
                 } else if (par2ArrayOfStr.length == 2 && par2ArrayOfStr[0].equals("keybindsvalue")) {
-                    return getListOfStringsMatchingLastWord(par2ArrayOfStr,new String[]{"increasevalue","decreasevalue"});
+                    return getListOfStringsMatchingLastWord(par2ArrayOfStr,"increasevalue","decreasevalue");
                 }
                 return null;
             }
@@ -75,11 +85,11 @@ public class TimeMasterAddon extends BTWAddon {
                             if (speedModifier > 250) {
                                 speedModifier = 250;
                                 worldSpeedModifier = speedModifier;
-                                iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("Your value was too high ! The world speed got forcefully set to the maximum value: 250x"));
+                                iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("Your value was too high ! The world speed got forcefully set to the maximum value available: 250x"));
                             } else if (speedModifier < 0.05F) {
                                 speedModifier = 0.05F;
                                 worldSpeedModifier = speedModifier;
-                                iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("Your value was too low ! The world speed got forcefully set to the minimum value: 0.05x"));
+                                iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("Your value was too low ! The world speed got forcefully set to the minimum value available: 0.05x"));
                             } else {
                                 worldSpeedModifier = speedModifier;
                                 iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("The world speed got set to " + speedModifier + "x"));
@@ -110,7 +120,7 @@ public class TimeMasterAddon extends BTWAddon {
                         try {
                             currentSpeedTest = true;
                             iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText(" "));
-                            iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("Testing the current speed of your game, it will take 5 secs..."));
+                            iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("Testing the current speed of your game, it will take 10 secs..."));
                             iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("--------------------------------------"));
                             iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("DON'T PAUSE THE GAME DURING THE PROCESS !"));
                             iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("--------------------------------------"));

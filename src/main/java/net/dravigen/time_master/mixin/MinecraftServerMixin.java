@@ -9,90 +9,98 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin {
 
-    @Shadow public WorldServer[] worldServers;
-    @Shadow public abstract ServerConfigurationManager getConfigurationManager();
+    @Shadow
+    public WorldServer[] worldServers;
+
+    @Shadow
+    public abstract ServerConfigurationManager getConfigurationManager();
 
     @Unique
-    private long prevTime=-1;
-    @Unique
-    private long prevTick=-1;
-    @Unique
-    private boolean iKeyPressed = false;
-    @Unique
-    private boolean dKeyPressed = false;
+    long prevTime;
 
 
+    @Inject(method = "tick", at = @At("HEAD"))
+    private void tickHead(CallbackInfo ci) {
+        TimeMasterAddon.tps = 1 / ((System.nanoTime() - prevTime) / 50000000d);
+    }
 
-    @Redirect(method = "sendTimerSpeedUpdate(F)V", at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(FF)F"),remap = false)
+    @Inject(method = "tick", at = @At("TAIL"))
+    private void tickTail(CallbackInfo ci) {
+        prevTime = System.nanoTime();
+
+    }
+
+
+    @Redirect(method = "sendTimerSpeedUpdate(F)V", at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(FF)F"), remap = false)
     private float redirectMax(float a, float b) {
         return a;
     }
 
     @ModifyConstant(method = "run", constant = @Constant(floatValue = 1.0F))
-    private float below1value(float value) { return Float.MIN_VALUE; }
+    private float below1value(float value) {
+        return Float.MIN_VALUE;
+    }
 
-    @Redirect(method = "run",at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getMinSpeedModifier()F"),remap = false)
-    private float setWorldSpeed(MinecraftServer instance) {
+    @Unique
+    long pastTime = -1;
+    @Unique
+    List<Double> speedNumbers = new ArrayList<>();
+
+
+
+    @Redirect(method = "run", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getMinSpeedModifier()F"), remap = false)
+    private float setWorldSpeedServer(MinecraftServer instance) {
         float speedModifier = this.getMinSpeedModifier();
-        if (TimeMasterAddon.reset_time_speed_key.isPressed()) {
-            TimeMasterAddon.worldSpeedModifier = 1;
-            this.getConfigurationManager().sendPacketToAllPlayers(new Packet3Chat(ChatMessageComponent.createFromText("The world speed got reset")));
-
-            return speedModifier;
-        }
-        if(TimeMasterAddon.increase_time_speed_key.isPressed()&&!iKeyPressed&&!TimeMasterAddon.decrease_time_speed_key.isPressed()){
-            iKeyPressed=true;
-            TimeMasterAddon.worldSpeedModifier = worldServers[0].getData(TimeMasterAddon.INCREASE_VALUE);
-            this.getConfigurationManager().sendPacketToAllPlayers(new Packet3Chat(ChatMessageComponent.createFromText("World speed got set to " + TimeMasterAddon.worldSpeedModifier + "x")));
-        }else iKeyPressed=false;
-        if(TimeMasterAddon.decrease_time_speed_key.isPressed()&&!dKeyPressed){
-            dKeyPressed=true;
-            TimeMasterAddon.worldSpeedModifier = worldServers[0].getData(TimeMasterAddon.DECREASE_VALUE);
-            this.getConfigurationManager().sendPacketToAllPlayers(new Packet3Chat(ChatMessageComponent.createFromText("World speed got set to " + TimeMasterAddon.worldSpeedModifier + "x")));
-        }else dKeyPressed=false;
         if (TimeMasterAddon.worldSpeedModifier != 1F) {
             speedModifier = TimeMasterAddon.worldSpeedModifier;
         }
         if (TimeMasterAddon.currentSpeedTest) {
-            long currentTime = System.currentTimeMillis();
-            if (prevTime==-1){
-                prevTime = currentTime;
+            if (pastTime == -1) {
+                pastTime = System.currentTimeMillis();
             }
-            long relativeTime= TimeMasterAddon.maxSpeedTest ? 25000-(currentTime-prevTime) : 6000-(currentTime-prevTime);
-            if (((TimeMasterAddon.maxSpeedTest&& relativeTime<=20000)||(relativeTime<=5000))&&prevTick==-1) {
-                prevTick = instance.getTickCounter();
-            }
-            if (relativeTime <= 0) {
-                float result = (float) (instance.getTickCounter() - prevTick);
-                result/= TimeMasterAddon.maxSpeedTest ? 400 : 100;
-                if (TimeMasterAddon.maxSpeedTest){
-                    TimeMasterAddon.worldSpeedModifier=1;
-                    this.getConfigurationManager().sendPacketToAllPlayers(new Packet3Chat(ChatMessageComponent.createFromText("Your pc could handle at most: " + result + "x")));
-                }else {
-                    this.getConfigurationManager().sendPacketToAllPlayers(new Packet3Chat(ChatMessageComponent.createFromText("Your game currently run at: " + result + "x")));
+            long relativeTime = TimeMasterAddon.maxSpeedTest ? 25000 + pastTime : 10000 + pastTime;
+            if (relativeTime > System.currentTimeMillis()) {
+                if (pastTime + 2500 < System.currentTimeMillis()) {
+                    speedNumbers.add(TimeMasterAddon.tps);
+                }
+            } else {
+                double sum = 0;
+                for (double tickSpeed : speedNumbers) {
+                    sum += tickSpeed;
+                }
+                double result = sum / speedNumbers.size();
+
+                if (TimeMasterAddon.maxSpeedTest) {
+                    TimeMasterAddon.worldSpeedModifier = 1;
+                    this.getConfigurationManager().sendPacketToAllPlayers(new Packet3Chat(ChatMessageComponent.createFromText("Your pc could handle at most: " + String.format("%.3f", result) + "x")));
+                } else {
+                    this.getConfigurationManager().sendPacketToAllPlayers(new Packet3Chat(ChatMessageComponent.createFromText("Your game currently run at: " + String.format("%.3f", result) + "x")));
                 }
                 TimeMasterAddon.currentSpeedTest = false;
                 TimeMasterAddon.maxSpeedTest = false;
-                prevTime = -1;
-                prevTick = -1;
+                pastTime = -1;
+                speedNumbers.clear();
             }
         }
         return speedModifier;
     }
 
-    @Inject(method = "stopServer",at = @At("HEAD"))
-    private void resetWorldSpeedWhenLeaving(CallbackInfo ci){
-        TimeMasterAddon.worldSpeedModifier=1;
+    @Inject(method = "stopServer", at = @At("HEAD"))
+    private void resetWorldSpeedWhenLeaving(CallbackInfo ci) {
+        TimeMasterAddon.worldSpeedModifier = 1;
     }
 
     @Unique
     private float getMinSpeedModifier() {
         float minSpeedModifier = Float.MAX_VALUE;
 
-        for(WorldServer world : this.worldServers) {
+        for (WorldServer world : this.worldServers) {
             if (world != null && !world.playerEntities.isEmpty()) {
                 float speedModifier = world.getMinSpeedModifier();
                 if (speedModifier < minSpeedModifier) {
@@ -103,5 +111,4 @@ public abstract class MinecraftServerMixin {
 
         return minSpeedModifier == Float.MAX_VALUE ? 1.0F : minSpeedModifier;
     }
-
 }

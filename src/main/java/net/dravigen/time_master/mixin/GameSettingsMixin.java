@@ -1,7 +1,6 @@
 package net.dravigen.time_master.mixin;
 
 import net.dravigen.time_master.TimeMasterAddon;
-import net.minecraft.src.EnumOptions;
 import net.minecraft.src.GameSettings;
 import net.minecraft.src.KeyBinding;
 import net.minecraft.src.Minecraft;
@@ -11,7 +10,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.io.File;
 import java.util.Arrays;
@@ -35,14 +33,10 @@ public abstract class GameSettingsMixin {
     private void KeyMapping$initTail(CallbackInfo ci) {
         KeyMappings$addKeyBinds();
     }
+
     @Inject(method = "<init>(Lnet/minecraft/src/Minecraft;Ljava/io/File;)V", at = @At(value = "TAIL"))
     private void KeyMapping$initTailLoadOpts(Minecraft par1Minecraft, File par2File, CallbackInfo ci) {
         KeyMappings$addKeyBinds();
         loadOptions();
-    }
-
-
-    @Inject(method = "getKeyBinding", at = @At("HEAD"))
-    public void KeyMapping$getKeyBinding(EnumOptions par1EnumOptions, CallbackInfoReturnable<String> cir) {
     }
 }
