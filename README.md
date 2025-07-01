@@ -1,5 +1,8 @@
 # Master Of Time (BtW's Addon)
 
+<p align="center">
+  <img src="image/Master Of Time.png?raw=true" alt="Addon's banner" width="800"/>
+</p>
 
 ## Presentation
 Tired of having to sleep during the night or to use addons like Progressive Item Speedup (https://github.com/BTW-Community/Progressive-Item-Speedup-Addon) or Nightmare Mode (https://github.com/elmi2305/Nightmare-Mode-CE-3.x) for their world speeding feature to test redstone contraptions and farms ? 
