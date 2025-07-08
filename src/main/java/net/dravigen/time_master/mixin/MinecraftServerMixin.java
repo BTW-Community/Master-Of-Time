@@ -21,6 +21,9 @@ public abstract class MinecraftServerMixin {
     @Shadow
     public abstract ServerConfigurationManager getConfigurationManager();
 
+    @Shadow public abstract void sendChatToPlayer(ChatMessageComponent par1ChatMessageComponent);
+
+    @Shadow private static MinecraftServer mcServer;
     @Unique
     long prevTime;
 
@@ -39,12 +42,18 @@ public abstract class MinecraftServerMixin {
 
     @Redirect(method = "sendTimerSpeedUpdate(F)V", at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(FF)F"), remap = false)
     private float redirectMax(float a, float b) {
-        return a;
+        if (TimeMasterAddon.worldSpeedModifier<1) {
+            return a;
+        }
+        return Math.max(a,b);
     }
 
     @ModifyConstant(method = "run", constant = @Constant(floatValue = 1.0F))
     private float below1value(float value) {
-        return Float.MIN_VALUE;
+        if (TimeMasterAddon.worldSpeedModifier<1) {
+            return Float.MIN_VALUE;
+        }
+        return value;
     }
 
     @Unique
@@ -56,7 +65,7 @@ public abstract class MinecraftServerMixin {
 
     @Redirect(method = "run", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getMinSpeedModifier()F"), remap = false)
     private float setWorldSpeedServer(MinecraftServer instance) {
-        float speedModifier = this.getMinSpeedModifier();
+        float speedModifier = getMinSpeedModifier();
         if (TimeMasterAddon.worldSpeedModifier != 1F) {
             speedModifier = TimeMasterAddon.worldSpeedModifier;
         }
@@ -91,7 +100,7 @@ public abstract class MinecraftServerMixin {
         return speedModifier;
     }
 
-    @Inject(method = "stopServer", at = @At("HEAD"))
+    @Inject(method = "stopServer", at = @At("TAIL"))
     private void resetWorldSpeedWhenLeaving(CallbackInfo ci) {
         TimeMasterAddon.worldSpeedModifier = 1;
     }
