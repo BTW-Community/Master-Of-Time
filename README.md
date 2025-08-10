@@ -35,11 +35,11 @@ Keybinds:
 - R = Reset the world speed to 1x
 - F = Increase the world speed to 10x (can be modified using command)
 - G = Decrease the world speed to 0.25x (can be modified using command)
-- 
+
 (BEWARE: this addon can cause freezes, and bugs. Please report it in the BtW discord server at the Master Of Time addon showcase channel if you have any issue)
 
 ## Download
-https://github.com/BTW-Community/Master-Of-Time/releases
+For BtW 3.X: https://github.com/BTW-Community/Master-Of-Time/releases
 
 ## License
 
