@@ -17,6 +17,7 @@ However your speeding capability depends on your pc, in some case some pc can't 
 
 This Addon is mainly meant for creative mode usage such as redstone testing, mid-long term testing of certain farms
 It's *possible* to use it in gameplay but at **your own risk** !
+It is a server side addon, so if you make a server with it, players don't have to install it.
 
 ## How to use
 
