@@ -1,4 +1,4 @@
-# Master Of Time (BtW's Addon)
+# Master Of Time (BtW 3.X Addon)
 
 <p align="center">
   <img src="image/Master Of Time.png?raw=true" alt="Addon's banner" width="800"/>
@@ -39,7 +39,7 @@ Keybinds:
 (BEWARE: this addon can cause freezes, and bugs. Please report it in the BtW discord server at the Master Of Time addon showcase channel if you have any issue)
 
 ## Download
-For BtW 3.X: https://github.com/BTW-Community/Master-Of-Time/releases
+https://github.com/BTW-Community/Master-Of-Time/releases
 
 ## License
 
