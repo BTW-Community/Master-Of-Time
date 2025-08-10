@@ -5,7 +5,7 @@
 </p>
 
 ## Presentation
-Tired of having to sleep during the night or to use addons like Progressive Item Speedup (https://github.com/BTW-Community/Progressive-Item-Speedup-Addon) or Nightmare Mode (https://github.com/elmi2305/Nightmare-Mode-CE-3.x) for their world speeding feature to test redstone contraptions and farms ? 
+Tired of having to sleep during the night or to use addons like [Progressive Item Speedup](https://github.com/BTW-Community/Progressive-Item-Speedup-Addon) or [Nightmare Mode](https://github.com/elmi2305/Nightmare-Mode-CE-3.x) for their world speeding feature to test redstone contraptions and farms ? 
 
 Well... i got you covered !
 
