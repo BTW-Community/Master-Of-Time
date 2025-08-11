@@ -38,6 +38,10 @@ Keybinds:
 
 (BEWARE: this addon can cause freezes, and bugs. Please report it in the BtW discord server at the Master Of Time addon showcase channel if you have any issue)
 
+## Found a bug or have suggestions ?
+
+https://github.com/BTW-Community/Master-Of-Time/issues
+
 ## Download
 https://github.com/BTW-Community/Master-Of-Time/releases
 
