@@ -44,8 +44,3 @@ https://github.com/BTW-Community/Master-Of-Time/issues
 
 ## Download
 https://github.com/BTW-Community/Master-Of-Time/releases
-
-## License
-
-This addon is under the CC-BY 4.0 license.
-(https://creativecommons.org/licenses/by/4.0/deed.en)
