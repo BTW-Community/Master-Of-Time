@@ -7,6 +7,7 @@ import btw.world.util.data.DataProvider;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.*;
 import org.lwjgl.input.Keyboard;
+
 import java.util.List;
 
 public class TimeMasterAddon extends BTWAddon {
@@ -20,21 +21,42 @@ public class TimeMasterAddon extends BTWAddon {
     public static boolean maxSpeedTest = false;
     public static double tps;
 
-    public static DataEntry<Float> INCREASE_VALUE = DataProvider.getBuilder(float.class)
+
+    private static final String MASTER_OF_TIME_DATA_NAME = "MasterOfTimeData";
+    public static final DataEntry.WorldDataEntry<float[]> MASTER_OF_TIME_DATA = DataProvider.getBuilder(float[].class)
+            .name(MASTER_OF_TIME_DATA_NAME)
+            .defaultSupplier(()-> new float[]{10f,0.25f})
+            .readNBT(tag -> {
+                if(!tag.hasKey(MASTER_OF_TIME_DATA_NAME)) {
+                    NBTTagCompound defaultValue = new NBTTagCompound();
+                    defaultValue.setFloat("increaseValue", 10f);
+                    defaultValue.setFloat("decreaseValue",0.25f);
+                    tag.setCompoundTag(MASTER_OF_TIME_DATA_NAME, defaultValue);
+                }
+                NBTTagCompound value = tag.getCompoundTag(MASTER_OF_TIME_DATA_NAME);
+                return new float[]{value.getFloat("increaseValue"),value.getFloat("decreaseValue")};
+            })
+            .writeNBT((tag, value) -> {
+                NBTTagCompound newValue = new NBTTagCompound();
+                newValue.setFloat("increaseValue", value[0]);
+                newValue.setFloat("decreaseValue", value[1]);
+                tag.setCompoundTag(MASTER_OF_TIME_DATA_NAME, newValue);
+            })
             .global()
-            .name("increase_value")
-            .defaultSupplier(() -> (float) 10)
-            .readNBT(NBTTagCompound::getFloat)
-            .writeNBT(NBTTagCompound::setFloat)
             .build();
 
-    public static DataEntry<Float> DECREASE_VALUE = DataProvider.getBuilder(float.class)
-            .global()
-            .name("decrease_value")
-            .defaultSupplier(() -> (float) 0.25)
-            .readNBT(NBTTagCompound::getFloat)
-            .writeNBT(NBTTagCompound::setFloat)
-            .build();
+    public static float getIncreaseValue(WorldServer server){
+        return server.getData(MASTER_OF_TIME_DATA)[0];
+    }
+    public static float getDecreaseValue(WorldServer server){
+        return server.getData(MASTER_OF_TIME_DATA)[1];
+    }
+    public static void setIncreaseValue(WorldServer server, float value){
+        server.setData(MASTER_OF_TIME_DATA,new float[]{value,server.getData(MASTER_OF_TIME_DATA)[1]});
+    }
+    public static void setDecreaseValue(WorldServer server, float value){
+        server.setData(MASTER_OF_TIME_DATA,new float[]{server.getData(MASTER_OF_TIME_DATA)[0],value});
+    }
 
     public TimeMasterAddon() {
         super();
@@ -53,6 +75,7 @@ public class TimeMasterAddon extends BTWAddon {
         if (!MinecraftServer.getIsServer()) {
             initKeybind();
         }
+
     }
 
     private void createNewCommand() {
@@ -144,15 +167,16 @@ public class TimeMasterAddon extends BTWAddon {
 
                         }
                     }
+
                     case "keybindsvalue" -> {
                         try {
                             WorldServer worldServer = MinecraftServer.getServer().worldServers[0];
                             if (strings[1].equals("increasevalue")) {
-                                worldServer.setData(INCREASE_VALUE, Math.min(250, Float.parseFloat(strings[2])));
-                                iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("By pressing " + Keyboard.getKeyName(increase_time_speed_key.keyCode) + ", the world speed will be set to " + worldServer.getData(INCREASE_VALUE) + "x"));
+                                setIncreaseValue(worldServer,Math.min(250, Float.parseFloat(strings[2])));
+                                iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("By pressing " + Keyboard.getKeyName(increase_time_speed_key.keyCode) + ", the world speed will be set to " + getIncreaseValue(worldServer) + "x"));
                             } else if (strings[1].equals("decreasevalue")) {
-                                worldServer.setData(DECREASE_VALUE, Math.max(0.05F, Float.parseFloat(strings[2])));
-                                iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("By pressing " + Keyboard.getKeyName(decrease_time_speed_key.keyCode) + ", the world speed will be set to " + worldServer.getData(DECREASE_VALUE) + "x"));
+                                setDecreaseValue(worldServer,Math.max(0.05F, Float.parseFloat(strings[2])));
+                                iCommandSender.sendChatToPlayer(ChatMessageComponent.createFromText("By pressing " + Keyboard.getKeyName(decrease_time_speed_key.keyCode) + ", the world speed will be set to " + getDecreaseValue(worldServer) + "x"));
                             }
                         } catch (NumberFormatException e) {
                             throw new WrongUsageException("Invalid command.");
@@ -172,8 +196,9 @@ public class TimeMasterAddon extends BTWAddon {
 
     @Override
     public void preInitialize() {
-        INCREASE_VALUE.register();
-        DECREASE_VALUE.register();
+        //INCREASE_VALUE.register();
+        //DECREASE_VALUE.register();
+        MASTER_OF_TIME_DATA.register();
     }
 
 }

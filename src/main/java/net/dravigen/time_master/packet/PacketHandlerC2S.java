@@ -30,26 +30,27 @@ public class PacketHandlerC2S {
                 MinecraftServer server = MinecraftServer.getServer();
                 String[] splitText = receivedMessage.split(":");
                 String subChannel = splitText[0];
-                if (splitText.length==2) {
-                    String property = splitText[1];
-                }
                 if (server.getConfigurationManager().isPlayerOpped(player.getEntityName())) {
+                    WorldServer worldServer = player.getServerForPlayer();
                     switch (subChannel) {
                         case "reset" -> {
                             TimeMasterAddon.worldSpeedModifier = 1;
                             server.getConfigurationManager().sendChatMsg(ChatMessageComponent.createFromText("The world speed got reset"));
                         }
                         case "increase" -> {
-                            float value = server.worldServers[0].getData(TimeMasterAddon.INCREASE_VALUE);
-                            TimeMasterAddon.worldSpeedModifier = value;
-                            server.getConfigurationManager().sendChatMsg(ChatMessageComponent.createFromText("The world speed got increased to " + value));
+                            float value = TimeMasterAddon.getIncreaseValue(worldServer);
+                            if (value >= 0.05) {
+                                TimeMasterAddon.worldSpeedModifier = value;
+                                server.getConfigurationManager().sendChatMsg(ChatMessageComponent.createFromText("The world speed got increased to " + value));
+                            }else server.getConfigurationManager().sendChatMsg(ChatMessageComponent.createFromText("Increase value is too low ! You cannot go beyond 0.05 !").setColor(EnumChatFormatting.RED));
                         }
                         case "decrease" -> {
-                            float value = server.worldServers[0].getData(TimeMasterAddon.DECREASE_VALUE);
-                            TimeMasterAddon.worldSpeedModifier = value;
-                            server.getConfigurationManager().sendChatMsg(ChatMessageComponent.createFromText("The world speed got decreased to " + value));
+                            float value = TimeMasterAddon.getDecreaseValue(worldServer);
+                            if (value >= 0.05) {
+                                TimeMasterAddon.worldSpeedModifier = value;
+                                server.getConfigurationManager().sendChatMsg(ChatMessageComponent.createFromText("The world speed got decreased to " + value));
+                            }else server.getConfigurationManager().sendChatMsg(ChatMessageComponent.createFromText("Decrease value is too low ! You cannot go beyond 0.05 !").setColor(EnumChatFormatting.RED));
                         }
-
                     }
                 }
             } catch (IOException e) {

@@ -9,8 +9,7 @@
     "NetServerHandlerMixin"
   ],
   "client": [
-    "EntityClientPlayerMPMixin",
-    "NetClientHandlerMixin"
+    "EntityClientPlayerMPMixin"
   ],
   "injectors": {
     "defaultRequire": 1

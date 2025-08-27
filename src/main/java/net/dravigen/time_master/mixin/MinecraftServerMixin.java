@@ -21,9 +21,6 @@ public abstract class MinecraftServerMixin {
     @Shadow
     public abstract ServerConfigurationManager getConfigurationManager();
 
-    @Shadow public abstract void sendChatToPlayer(ChatMessageComponent par1ChatMessageComponent);
-
-    @Shadow private static MinecraftServer mcServer;
     @Unique
     long prevTime;
 
