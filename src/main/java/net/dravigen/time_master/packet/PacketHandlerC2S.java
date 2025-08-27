@@ -31,7 +31,7 @@ public class PacketHandlerC2S {
                 String[] splitText = receivedMessage.split(":");
                 String subChannel = splitText[0];
                 if (server.getConfigurationManager().isPlayerOpped(player.getEntityName())) {
-                    WorldServer worldServer = player.getServerForPlayer();
+                    WorldServer worldServer = server.worldServers[0];
                     switch (subChannel) {
                         case "reset" -> {
                             TimeMasterAddon.worldSpeedModifier = 1;
