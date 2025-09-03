@@ -1,14 +1,13 @@
 ---
 name: Bug report
 about: Create a bug report
-title: 'Bug:'
-labels: ''
+title: ''
+labels: bug
 assignees: ''
 
 ---
 
 **Describe the bug**
-A clear and concise description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce the behavior:
@@ -16,10 +15,9 @@ Steps to reproduce the behavior:
 2. 
 
 **Expected behavior**
-A clear and concise description of what you expected to happen if you know.
 
 **Screenshots**
-If applicable, add screenshots to help explain your problem.
+
 
 **Settings: please complete the following information):**
  - OS: [e.g. Windows]
@@ -28,4 +26,3 @@ If applicable, add screenshots to help explain your problem.
  - Additional addons [e.g. Dynamic light v1.2.0]
 
 **Additional context**
-Add any other context about the problem here.
