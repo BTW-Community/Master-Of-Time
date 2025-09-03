@@ -6,10 +6,13 @@
   "mixins": [
     "GameSettingsMixin",
     "MinecraftServerMixin",
-    "NetServerHandlerMixin"
+    "NetServerHandlerMixin",
+    "ServerConfigManagerMixin",
+    "WorldMixin"
   ],
   "client": [
-    "EntityClientPlayerMPMixin"
+    "EntityClientPlayerMPMixin",
+    "MinecraftMixin"
   ],
   "injectors": {
     "defaultRequire": 1

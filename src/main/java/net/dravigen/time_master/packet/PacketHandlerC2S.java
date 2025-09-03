@@ -35,21 +35,21 @@ public class PacketHandlerC2S {
                     switch (subChannel) {
                         case "reset" -> {
                             TimeMasterAddon.worldSpeedModifier = 1;
-                            server.getConfigurationManager().sendChatMsg(ChatMessageComponent.createFromText("The world speed got reset"));
+                            server.getConfigurationManager().sendChatMsg(ChatMessageComponent.createFromText("The game is running normally"));
                         }
                         case "increase" -> {
                             float value = TimeMasterAddon.getIncreaseValue(worldServer);
-                            if (value >= 0.05) {
+                            if (value >= 0.2) {
                                 TimeMasterAddon.worldSpeedModifier = value;
-                                server.getConfigurationManager().sendChatMsg(ChatMessageComponent.createFromText("The world speed got increased to " + value));
-                            }else server.getConfigurationManager().sendChatMsg(ChatMessageComponent.createFromText("Increase value is too low ! You cannot go beyond 0.05 !").setColor(EnumChatFormatting.RED));
+                                server.getConfigurationManager().sendChatMsg(ChatMessageComponent.createFromText("The tick rate 'goal' got set to " + value + "x (" + String.format("%.3f", value*20) + " t/s)"));
+                            }else player.sendChatToPlayer(ChatMessageComponent.createFromText("Increase value is too low ! You cannot go below 0.01x (0.2 t/s) !").setColor(EnumChatFormatting.RED));
                         }
                         case "decrease" -> {
                             float value = TimeMasterAddon.getDecreaseValue(worldServer);
-                            if (value >= 0.05) {
+                            if (value >= 0.2) {
                                 TimeMasterAddon.worldSpeedModifier = value;
-                                server.getConfigurationManager().sendChatMsg(ChatMessageComponent.createFromText("The world speed got decreased to " + value));
-                            }else server.getConfigurationManager().sendChatMsg(ChatMessageComponent.createFromText("Decrease value is too low ! You cannot go beyond 0.05 !").setColor(EnumChatFormatting.RED));
+                                server.getConfigurationManager().sendChatMsg(ChatMessageComponent.createFromText("The tick rate 'goal' got set to " + value + "x (" + String.format("%.3f", value*20) + " t/s)"));
+                            }else player.sendChatToPlayer(ChatMessageComponent.createFromText("Decrease value is too low ! You cannot go below 0.01x (0.2 t/s) !").setColor(EnumChatFormatting.RED));
                         }
                     }
                 }

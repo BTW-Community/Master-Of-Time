@@ -24,10 +24,14 @@ public abstract class GameSettingsMixin {
 
     @Unique
     private void KeyMappings$addKeyBinds(){
-        keyBindings = Arrays.copyOf(keyBindings,  keyBindings.length + 3);
+        keyBindings = Arrays.copyOf(keyBindings,  keyBindings.length + 5);
         keyBindings[keyBindings.length - 1] = TimeMasterAddon.reset_time_speed_key;
         keyBindings[keyBindings.length - 2] = TimeMasterAddon.increase_time_speed_key;
         keyBindings[keyBindings.length - 3] = TimeMasterAddon.decrease_time_speed_key;
+        keyBindings[keyBindings.length - 4] = TimeMasterAddon.freeze_time_speed_key;
+        keyBindings[keyBindings.length - 5] = TimeMasterAddon.step_time_key;
+
+
     }
     @Inject(method = "<init>()V", at = @At(value = "TAIL"))
     private void KeyMapping$initTail(CallbackInfo ci) {

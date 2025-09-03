@@ -5,7 +5,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import net.dravigen.time_master.TimeMasterAddon;
-import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.Minecraft;
 import net.minecraft.src.Packet250CustomPayload;
 
@@ -40,13 +39,7 @@ public class PacketSender {
         }
     }
 
-    /**
-     * Sends a custom string message packet from Server to a specific Client.
-     * This method MUST be called on the SERVER side.
-     *
-     * @param player The player to send the message to.
-     * @param message The string/boolean message to send.
-     */
+    /*
     public static void sendServerToClientMessage(EntityPlayerMP player, Object message) {
         if (player.worldObj.isRemote) {
             System.err.println("Attempted to send S2C packet from client-side!");
@@ -67,5 +60,5 @@ public class PacketSender {
             System.err.println("SERVER: Error sending S2C message to " + player.getCommandSenderName() + ": " + e.getMessage());
             e.printStackTrace();
         }
-    }
+    }*/
 }
