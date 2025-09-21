@@ -19,7 +19,8 @@ It is a server side addon, so if you make a server with it, players don't have t
 
 ## How to use
 
-The closest you get to the extremes in term of speed (very low or very high speed) the less stable and more difficult it is to interact with the world, but by making the player unaffected by time speed change (with the /tick playerAffected command), it is way easier to move around and interact.
+The closest you get to the extremes in term of speed (very low or very high speed) the more difficult it is to interact with the world.
+To counteract that, it is possible to make the player unaffected by time speed (with the /tick playerAffected command).
 
 To use this addon you can use commands:
 - "/tick set {number}" : let you decide which speed you want your game to run at
