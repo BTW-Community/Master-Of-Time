@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "timemaster",
+  "id": "master_of_time",
   "version": "${version}",
   "name": "Master Of Time",
   "description": "Lets you control the flow of time",
@@ -16,17 +16,17 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.dravigen.time_master.TimeMasterMod"
+      "net.dravigen.master_of_time.MasterOfTimeMod"
     ],
     "btw:addon": [
-      "net.dravigen.time_master.TimeMasterAddon"
+      "net.dravigen.master_of_time.MasterOfTimeAddon"
     ]
   },
   "custom": {
     "btw:addon_prefix": "EX"
   },
   "mixins": [
-    "time_master.mixins.json"
+    "master_of_time.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.14.19",
