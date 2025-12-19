@@ -6,7 +6,6 @@
   "mixins": [
     "GameSettingsMixin",
     "MinecraftServerMixin",
-    "NetServerHandlerMixin",
     "ServerConfigManagerMixin",
     "WorldMixin"
   ],

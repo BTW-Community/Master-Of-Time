@@ -1,13 +1,15 @@
 package net.dravigen.master_of_time;
 
-import btw.AddonHandler;
-import btw.BTWAddon;
-import btw.world.util.data.DataEntry;
-import btw.world.util.data.DataProvider;
+import api.AddonHandler;
+import api.BTWAddon;
+import api.world.data.DataEntry;
+import api.world.data.DataProvider;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.*;
 import org.lwjgl.input.Keyboard;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.util.List;
 
 public class MasterOfTimeAddon extends BTWAddon {
@@ -341,6 +343,7 @@ public class MasterOfTimeAddon extends BTWAddon {
 	}
 	
 	public void preInitialize() {
+		this.modID = "MoT";
 		MASTER_OF_TIME_DATA.register();
 		TIME_AFFECTED.register();
 		PLAYER_OP.register();
@@ -354,11 +357,68 @@ public class MasterOfTimeAddon extends BTWAddon {
 			initKeybind();
 		}
 		
+		this.registerPacketHandler(MoTChannel, (packet, player) -> {
+			ByteArrayInputStream bis = new ByteArrayInputStream(packet.data);
+			DataInputStream dis = new DataInputStream(bis);
+			
+			String receivedMessage = dis.readUTF();
+			
+			// --- STUFF ON SERVER HERE ---
+			
+			MinecraftServer server = MinecraftServer.getServer();
+			String[] splitText = receivedMessage.split(":");
+			String subChannel = splitText[0];
+			if (server.getConfigurationManager().isPlayerOpped(player.getEntityName())) {
+				WorldServer worldServer = server.worldServers[0];
+				switch (subChannel) {
+					case "reset" -> {
+						worldSpeedModifier = 1;
+						server.getConfigurationManager()
+								.sendChatMsg(ChatMessageComponent.createFromText("The game is running normally"));
+					}
+					case "increase" -> {
+						float value = getUpSpeed(worldServer);
+						
+						if (value > 1) {
+							worldSpeedModifier = value;
+							server.getConfigurationManager()
+									.sendChatMsg(ChatMessageComponent.createFromText(
+											"The tick rate 'goal' got set to " +
+													String.format("%.2f", value) +
+													"x (" +
+													String.format("%.1f", value * 20) +
+													" t/s)"));
+						}
+						else {
+							player.sendChatToPlayer(ChatMessageComponent.createFromText(
+											"Up key speed is too low ! It should be at least above 1x (20 t/s) !")
+															.setColor(EnumChatFormatting.RED));
+						}
+					}
+					case "decrease" -> {
+						float value = getDownSpeed(worldServer);
+						if (value < 1) {
+							worldSpeedModifier = value;
+							server.getConfigurationManager()
+									.sendChatMsg(ChatMessageComponent.createFromText(
+											"The tick rate 'goal' got set to " +
+													String.format("%.2f", value) +
+													"x (" +
+													String.format("%.1f", value * 20) +
+													" t/s)"));
+						}
+						else {
+							player.sendChatToPlayer(ChatMessageComponent.createFromText(
+											"Down key speed is too high ! It should be at least below 1x (20 t/s) !")
+															.setColor(EnumChatFormatting.RED));
+						}
+					}
+				}
+			}
+		});
 	}
 	
-	public static class TMChannel {
-		public static final String CLIENT_TO_SERVER_CHANNEL = "MoT:C2S";
-	}
+	public static final String MoTChannel = "MoT|C2S";
 }
 
 

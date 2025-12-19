@@ -9,6 +9,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.io.IOException;
+
 import static net.dravigen.master_of_time.MasterOfTimeAddon.*;
 
 @Mixin(EntityClientPlayerMP.class)
@@ -27,7 +29,7 @@ public abstract class EntityClientPlayerMPMixin extends EntityPlayerSP {
 	}
 	
 	@Inject(method = "onUpdate", at = @At("HEAD"))
-	private void keyBindInputUpdate(CallbackInfo ci) {
+	private void keyBindInputUpdate(CallbackInfo ci) throws IOException {
 		if (step) {
 			worldSpeedModifier = prevSpeed;
 			step = false;
