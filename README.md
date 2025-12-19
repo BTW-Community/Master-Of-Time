@@ -23,15 +23,15 @@ The closest you get to the extremes in term of speed (very low or very high spee
 To counteract that, it is possible to make the player unaffected by time speed (with the /tick playerAffected command).
 
 To use this addon you can use commands:
-- "/tick set {number}" : let you decide which speed you want your game to run at
+- "/tick rate {number}" : let you decide which speed you want your game to run at
 - "/tick freeze" : freeze the world but not the player (beware can be a bit janky)
 - "/tick reset" : reset the world speed at 1x
 - "/tick speedtest" : let you know the current speed of the game (the higher the speed the less accurate it is)
 - "/tick maxspeedtest" : let you know the highest speed your pc could handle (can vary a lot depending on a lot of factor so it should be taken lightly, but it's a good indicator to know around which value your game can run)
-- "/tick keybinds <increasevalue/decreasevalue>" : let you decide the value at which the world speed will be set when the associated keybind is pressed
+- "/tick keybinds <upSpeedKey|downSpeedKey>" : let you decide the value at which the world speed will be set when the associated keybind is pressed
 - "/tick playerAffected <true|false>" : let you decide if the player should be affected by changed time flow (the player is not affected when the game is frozen regardless)
 
-Or keybinds *(only while in creative mode)*:
+Or keybinds *(only if cheats are enabled)*:
 - R = Reset the world speed to 1x
 - G = Increase the world speed to 10x (can be modified using command)
 - V = Decrease the world speed to 0.25x (can be modified using command)
