@@ -1,78 +1,48 @@
-# Fabric Example Mod
+# Master Of Time (BtW 3.X Addon)
 
-- [Quick start guide](#quick-start-guide)
-  - [Introduction to the folder structure](#introduction-to-the-folder-structure)
-  - [Creating your mod](#creating-your-mod)
-  - [Useful gradle commands](#useful-gradle-commands)
-- [More info](#more-info)
-- [License](#license)
+<p align="center">
+  <img src="image/Master Of Time.png?raw=true" alt="Addon's banner" width="800"/>
+</p>
 
-## Quick start guide
+## Presentation
+Tired of speeding up the time by sleeping or by using addons like [Progressive Item Speedup](https://github.com/BTW-Community/Progressive-Item-Speedup-Addon) or [Nightmare Mode](https://github.com/elmi2305/Nightmare-Mode-CE-3.x) for their world speeding feature to test redstone contraptions and farms ? 
 
-* Clone this repository
-* Launch the *install.bat*
-* Wait till it fully finishes
-* Run the gradle task *build* and then *runClient*
+Well... i got you covered !
 
-### Introduction to the folder structure
+**The Master Of Time Addon** lets you fully control the flow of time. Might it be speeding up, slowing down, or even freezing the world, it is up to you.
 
-**Build files:**
+However your speeding capability depends on your pc, in some case some pc can't even speed up beyond 2x or at all... (but it's possible to go beyond 20x with a very good pc)
 
-| File                | Description                                              |
-| ------------------- | -------------------------------------------------------- |
-| `build.gradle`      | Configures the compilation process.                      |
-| `gradle.properties` | Contains properties for Minecraft, fabric, and your mod. |
-| `settings.gradle`   | Configures the plugin repositories.                      |
+This Addon is mainly meant for **creative mode** usage such as redstone testing, mid-long term testing of certain farms. But you could use commands in survival as well if you enable cheat.
 
-**Fabric files:**
+It is a server side addon, so if you make a server with it, players don't have to install it.
 
-These files are located at `src/main/resources`.
+## How to use
 
-| File                    | Description                              | Additional information                                                                                                |
-| ----------------------- | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `fabric.mod.json`       | Contains metadata about your mod.        | [wiki:fabric_mod_json_spec](https://fabricmc.net/wiki/documentation:fabric_mod_json_spec)                             |
-| `modid.mixins.json`     | Contains a list of all your mixin files. | [wiki:mixin_registration](https://fabricmc.net/wiki/tutorial:mixin_registration)                                      |
-| `assets/modid/icon.png` | The icon of your mod.                    | [wiki:fabric_mod_json_spec#icon](https://fabricmc.net/wiki/documentation:fabric_mod_json_spec?s[]=icon#custom_fields) |
+The closest you get to the extremes in term of speed (very low or very high speed) the more difficult it is to interact with the world.
+To counteract that, it is possible to make the player unaffected by time speed (with the /tick playerAffected command).
 
+To use this addon you can use commands:
+- "/tick set {number}" : let you decide which speed you want your game to run at
+- "/tick freeze" : freeze the world but not the player (beware can be a bit janky)
+- "/tick reset" : reset the world speed at 1x
+- "/tick speedtest" : let you know the current speed of the game (the higher the speed the less accurate it is)
+- "/tick maxspeedtest" : let you know the highest speed your pc could handle (can vary a lot depending on a lot of factor so it should be taken lightly, but it's a good indicator to know around which value your game can run)
+- "/tick keybinds <increasevalue/decreasevalue>" : let you decide the value at which the world speed will be set when the associated keybind is pressed
+- "/tick playerAffected <true|false>" : let you decide if the player should be affected by changed time flow (the player is not affected when the game is frozen regardless)
 
-### Creating your mod
+Or keybinds *(only while in creative mode)*:
+- R = Reset the world speed to 1x
+- G = Increase the world speed to 10x (can be modified using command)
+- V = Decrease the world speed to 0.25x (can be modified using command)
+- F = Freeze the game
+- N = Resume the game for one tick when the game is frozen
 
-First of you must replace all occurrences of `modid` with the id of your mod.
+(BEWARE: this addon can cause freezes, and bugs. Please report it in the BtW discord server at the Master Of Time addon showcase channel if you have any issue)
 
-If your mod doesn't use mixins you can safely remove the mixin entry in your `fabric.mod.json` as well as delete any `*.mixin.json` files.
+## Found a bug or have suggestions ?
 
-This template has the legacy fabric api included in it's build script, more info about the api can be found at it's [github repo](https://github.com/Legacy-Fabric/fabric).
-If you know what you are doing you can also safely remove the api from the build script as it isn't required.
+https://github.com/BTW-Community/Master-Of-Time/issues
 
-### Useful gradle commands
-
-```sh
-# Compile your mod
-./gradlew build
-
-# Remove old build files
-./gradlew clean
-
-# Generate Minecraft sources
-./gradlew genSources
-
-# Launch a modded Minecraft client
-./gradlew runClient
-
-# Kill gradle if it's doing stupid things
-./gradlew --stop
-```
-
-## More info
-
-Additional tutorials and tips can be found in the [wiki](https://github.com/Legacy-Fabric/fabric-example-mod/wiki).
-
-For more detailed setup instructions please see the [fabric wiki](https://fabricmc.net/wiki/tutorial:setup).
-
-If you are new to fabric or Minecraft modding in general then [this wiki page](https://fabricmc.net/wiki/tutorial:primer) may help you.
-
-## License
-
-This template is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
-This project incorporates:
-* A precompiled version of [Tiny Remapper](https://github.com/FabricMC/tiny-remapper) (LGPL-3.0)
+## Download
+https://github.com/BTW-Community/Master-Of-Time/releases
