@@ -10,7 +10,10 @@ import net.minecraft.src.*;
 import org.lwjgl.input.Keyboard;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.util.Locale;
 
 public class MasterOfTimeAddon extends BTWAddon {
 	
@@ -33,28 +36,18 @@ public class MasterOfTimeAddon extends BTWAddon {
 			.player()
 			.syncPlayer()
 			.buildPlayer();
-	private static final String MASTER_OF_TIME_DATA_NAME = "MasterOfTimeData";
-	public static final DataEntry.WorldDataEntry<float[]> MASTER_OF_TIME_DATA = DataProvider.getBuilder(float[].class)
-			.name(MASTER_OF_TIME_DATA_NAME)
-			.defaultSupplier(() -> new float[]{10f, 0.25f})
-			.readNBT(tag -> {
-				if (!tag.hasKey(MASTER_OF_TIME_DATA_NAME)) {
-					NBTTagCompound defaultValue = new NBTTagCompound();
-					defaultValue.setFloat("increaseValue", 10f);
-					defaultValue.setFloat("decreaseValue", 0.25f);
-					tag.setCompoundTag(MASTER_OF_TIME_DATA_NAME, defaultValue);
-				}
-				NBTTagCompound value = tag.getCompoundTag(MASTER_OF_TIME_DATA_NAME);
-				return new float[]{value.getFloat("increaseValue"), value.getFloat("decreaseValue")};
-			})
-			.writeNBT((tag, value) -> {
-				NBTTagCompound newValue = new NBTTagCompound();
-				newValue.setFloat("increaseValue", value[0]);
-				newValue.setFloat("decreaseValue", value[1]);
-				tag.setCompoundTag(MASTER_OF_TIME_DATA_NAME, newValue);
-			})
+	private static final String TICK_SPEED_NAME = "WorldTickSpeed";
+	public static final DataEntry.WorldDataEntry<Float> TICK_SPEED = DataProvider.getBuilder(Float.class)
+			.name(TICK_SPEED_NAME)
+			.defaultSupplier(() -> 1.0F)
+			.readNBT(NBTTagCompound::getFloat)
+			.writeNBT(NBTTagCompound::setFloat)
 			.global()
 			.build();
+	public static float upSpeedValue = 10.0f;
+	public static float downSpeedValue = 0.25f;
+	public static float originalTickSpeed = 1.0f;
+	public static boolean bCreateWorld = false;
 	public static KeyBinding reset_time_speed_key;
 	public static KeyBinding upSpeedKey;
 	public static KeyBinding downSpeedKey;
@@ -70,20 +63,48 @@ public class MasterOfTimeAddon extends BTWAddon {
 		super();
 	}
 	
-	public static float getUpSpeed(WorldServer server) {
-		return server.getData(MASTER_OF_TIME_DATA)[0];
+	public static void setOptionFloatValue(String name, float value) {
+		if (name.equals("downSpeedValue")) {
+			downSpeedValue = value;
+		}
+		else if (name.equals("upSpeedValue")) {
+			upSpeedValue = value;
+		}
+		
+		Minecraft.getMinecraft().gameSettings.saveOptions();
 	}
 	
-	public static float getDownSpeed(WorldServer server) {
-		return server.getData(MASTER_OF_TIME_DATA)[1];
+	public static void sendTickRateMsg(EntityPlayer player, float tickSpeed) {
+		String speed = String.format(java.util.Locale.ENGLISH, "%.2f", tickSpeed);
+		String tick = String.format(Locale.ENGLISH, "%.1f", tickSpeed * 20);
+		
+		player.sendChatToPlayer(ChatMessageComponent.createFromTranslationWithSubstitutions("mot.command.rate.success",
+																							speed,
+																							tick));
 	}
 	
-	public static void setIncreaseValue(WorldServer server, float value) {
-		server.setData(MASTER_OF_TIME_DATA, new float[]{value, server.getData(MASTER_OF_TIME_DATA)[1]});
-	}
-	
-	public static void setDecreaseValue(WorldServer server, float value) {
-		server.setData(MASTER_OF_TIME_DATA, new float[]{server.getData(MASTER_OF_TIME_DATA)[0], value});
+	public static void setTickSpeed(float speed, ICommandSender player) {
+		worldSpeedModifier = speed;
+		
+		if (speed != 0) {
+			if (player.getEntityWorld().isRemote) {
+				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+				DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
+				
+				try {
+					dataOutputStream.writeFloat(speed);
+					Minecraft.getMinecraft()
+							.getNetHandler()
+							.addToSendQueue(new Packet250CustomPayload(MoTChannel,
+																	   byteArrayOutputStream.toByteArray()));
+				} catch (Exception exception) {
+					exception.printStackTrace();
+				}
+			}
+			else {
+				player.getEntityWorld().setData(TICK_SPEED, speed);
+			}
+		}
 	}
 	
 	public void initKeybind() {
@@ -97,9 +118,9 @@ public class MasterOfTimeAddon extends BTWAddon {
 	
 	public void preInitialize() {
 		this.modID = "MoT";
-		MASTER_OF_TIME_DATA.register();
 		TIME_AFFECTED.register();
 		PLAYER_OP.register();
+		TICK_SPEED.register();
 	}
 	
 	@Override
@@ -115,63 +136,27 @@ public class MasterOfTimeAddon extends BTWAddon {
 			ByteArrayInputStream bis = new ByteArrayInputStream(packet.data);
 			DataInputStream dis = new DataInputStream(bis);
 			
-			String receivedMessage = dis.readUTF();
-			
-			// --- STUFF ON SERVER HERE ---
-			
-			MinecraftServer server = MinecraftServer.getServer();
-			String[] splitText = receivedMessage.split(":");
-			String subChannel = splitText[0];
-			if (server.getConfigurationManager().isPlayerOpped(player.getEntityName())) {
-				WorldServer worldServer = server.worldServers[0];
-				switch (subChannel) {
-					case "reset" -> {
-						worldSpeedModifier = 1;
-						server.getConfigurationManager()
-								.sendChatMsg(ChatMessageComponent.createFromText("The game is running normally"));
-					}
-					case "increase" -> {
-						float value = getUpSpeed(worldServer);
-						
-						if (value > 1) {
-							worldSpeedModifier = value;
-							server.getConfigurationManager()
-									.sendChatMsg(ChatMessageComponent.createFromText("The tick rate 'goal' got set to " +
-																							 String.format("%.2f",
-																										   value) +
-																							 "x (" +
-																							 String.format("%.1f",
-																										   value * 20) +
-																							 " t/s)"));
-						}
-						else {
-							player.sendChatToPlayer(ChatMessageComponent.createFromText(
-											"Up key speed is too low ! It should be at least above 1x (20 t/s) !")
-															.setColor(EnumChatFormatting.RED));
-						}
-					}
-					case "decrease" -> {
-						float value = getDownSpeed(worldServer);
-						if (value < 1) {
-							worldSpeedModifier = value;
-							server.getConfigurationManager()
-									.sendChatMsg(ChatMessageComponent.createFromText("The tick rate 'goal' got set to " +
-																							 String.format("%.2f",
-																										   value) +
-																							 "x (" +
-																							 String.format("%.1f",
-																										   value * 20) +
-																							 " t/s)"));
-						}
-						else {
-							player.sendChatToPlayer(ChatMessageComponent.createFromText(
-											"Down key speed is too high ! It should be at least below 1x (20 t/s) !")
-															.setColor(EnumChatFormatting.RED));
-						}
-					}
-				}
+			if (MinecraftServer.getServer().getConfigurationManager().isPlayerOpped(player.getEntityName())) {
+				float speed = dis.readFloat();
+				player.worldObj.setData(TICK_SPEED, speed);
 			}
 		});
+	}
+	
+	@Override
+	public void serverPlayerConnectionInitialized(NetServerHandler serverHandler, EntityPlayerMP playerMP) {
+		if (serverHandler.mcServer.isSinglePlayer()) {
+			float speed = bCreateWorld ? originalTickSpeed : playerMP.worldObj.getData(TICK_SPEED);
+			
+			speed = speed == 0 ? 1 : Math.min(speed, 250);
+			
+			if (bCreateWorld) {
+				playerMP.worldObj.setData(TICK_SPEED, speed);
+				bCreateWorld = false;
+			}
+			
+			MasterOfTimeAddon.worldSpeedModifier = speed;
+		}
 	}
 }
 

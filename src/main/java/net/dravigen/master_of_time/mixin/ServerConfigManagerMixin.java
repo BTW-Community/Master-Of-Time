@@ -2,6 +2,7 @@ package net.dravigen.master_of_time.mixin;
 
 import btw.network.packet.TimerSpeedPacket;
 import net.dravigen.master_of_time.MasterOfTimeAddon;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.EntityPlayerMP;
 import net.minecraft.src.Packet;
 import net.minecraft.src.ServerConfigurationManager;
@@ -20,6 +21,10 @@ public class ServerConfigManagerMixin {
 	@Final
 	public List playerEntityList;
 	
+	@Shadow
+	@Final
+	private MinecraftServer mcServer;
+	
 	@Inject(method = "sendPacketToAllPlayers", at = @At(value = "HEAD"), cancellable = true)
 	private void sendToAffectedPlayerOnly(Packet par1Packet, CallbackInfo ci) {
 		if (par1Packet instanceof TimerSpeedPacket) {
@@ -27,7 +32,8 @@ public class ServerConfigManagerMixin {
 			for (Object o : this.playerEntityList) {
 				EntityPlayerMP player = ((EntityPlayerMP) o);
 				if (player.getData(MasterOfTimeAddon.TIME_AFFECTED) &&
-						((TimerSpeedPacket) par1Packet).timerSpeed != 0) {
+						((TimerSpeedPacket) par1Packet).timerSpeed != 0 &&
+						MasterOfTimeAddon.worldSpeedModifier != 0) {
 					player.playerNetServerHandler.sendPacketToPlayer(par1Packet);
 				}
 				else {

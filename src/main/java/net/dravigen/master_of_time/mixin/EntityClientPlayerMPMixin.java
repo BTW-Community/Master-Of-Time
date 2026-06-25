@@ -1,6 +1,5 @@
 package net.dravigen.master_of_time.mixin;
 
-import net.dravigen.master_of_time.packet.PacketSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.src.*;
 import org.spongepowered.asm.mixin.Mixin;
@@ -9,13 +8,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.io.IOException;
-
 import static net.dravigen.master_of_time.MasterOfTimeAddon.*;
 
 @Mixin(EntityClientPlayerMP.class)
 public abstract class EntityClientPlayerMPMixin extends EntityPlayerSP {
-	
 	
 	@Unique
 	private boolean iKeyPressed = false;
@@ -29,52 +25,38 @@ public abstract class EntityClientPlayerMPMixin extends EntityPlayerSP {
 	}
 	
 	@Inject(method = "onUpdate", at = @At("HEAD"))
-	private void keyBindInputUpdate(CallbackInfo ci) throws IOException {
+	private void keyBindInputUpdate(CallbackInfo ci) {
 		if (step) {
 			worldSpeedModifier = prevSpeed;
 			step = false;
 		}
-		if (this.getData(PLAYER_OP) && this.mc.isSingleplayer()) {
+		
+		if (this.getData(PLAYER_OP) && this.mc.isSingleplayer() && MinecraftServer.getServer() != null) {
 			if (this.mc.currentScreen == null) {
 				if (reset_time_speed_key.isPressed()) {
-					PacketSender.sendClientToServerMessage("reset");
-					
-					if (MinecraftServer.getServer() != null) {
-						worldSpeedModifier = 1;
-					}
+					setTickSpeed(1, this);
+					this.sendChatToPlayer(ChatMessageComponent.createFromTranslationKey("mot.reset"));
 				}
 				
-				if (freeze_time_speed_key.isPressed() && MinecraftServer.getServer() != null) {
-					worldSpeedModifier = 0;
+				if (freeze_time_speed_key.isPressed()) {
+					setTickSpeed(0, this);
 					
-					this.sendChatToPlayer(ChatMessageComponent.createFromText("The game is frozen"));
+					this.sendChatToPlayer(ChatMessageComponent.createFromTranslationKey("mot.freeze"));
 				}
 				
 				if (upSpeedKey.isPressed() && !iKeyPressed && !downSpeedKey.isPressed()) {
 					iKeyPressed = true;
-					if (worldSpeedModifier != 0) {
-						PacketSender.sendClientToServerMessage("increase");
-					}
-					else {
-						if (MinecraftServer.getServer() != null) {
-							worldSpeedModifier = 1;
-							PacketSender.sendClientToServerMessage("increase");
-						}
-					}
 					
+					setTickSpeed(upSpeedValue, this);
+					sendTickRateMsg(this, worldSpeedModifier);
 				}
 				else iKeyPressed = false;
 				
 				if (downSpeedKey.isPressed() && !dKeyPressed) {
 					dKeyPressed = true;
-					if (worldSpeedModifier != 0) {
-						PacketSender.sendClientToServerMessage("decrease");
-					}
-					else if (MinecraftServer.getServer() != null) {
-						worldSpeedModifier = 1;
-						PacketSender.sendClientToServerMessage("decrease");
-					}
+					setTickSpeed(downSpeedValue, this);
 					
+					sendTickRateMsg(this, worldSpeedModifier);
 				}
 				else dKeyPressed = false;
 				
@@ -82,9 +64,10 @@ public abstract class EntityClientPlayerMPMixin extends EntityPlayerSP {
 					prevSpeed = 0;
 					worldSpeedModifier = 1;
 					step = true;
-					this.sendChatToPlayer(ChatMessageComponent.createFromText("Stepping 1 tick"));
+					this.sendChatToPlayer(ChatMessageComponent.createFromTranslationKey("mot.step"));
 				}
 			}
 		}
 	}
 }
+

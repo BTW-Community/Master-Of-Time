@@ -24,7 +24,6 @@ public class CommandTick extends CommandBase {
 	
 	@Override
 	public void processCommand(ICommandSender sender, String[] strings) {
-		WorldServer worldServer = MinecraftServer.getServer().worldServers[0];
 		if (strings.length == 0) throw new WrongUsageException(getCommandUsage(sender));
 		
 		switch (strings[0].toLowerCase()) {
@@ -60,12 +59,14 @@ public class CommandTick extends CommandBase {
 					
 					if (speedModifier < 0.01F) {
 						speedModifier = 0.01F;
-						worldSpeedModifier = speedModifier;
+						setTickSpeed(speedModifier, sender);
 						sender.sendChatToPlayer(ChatMessageComponent.createFromTranslationKey(
 								"mot.command.rate.error.tooLow"));
 					}
 					else {
-						worldSpeedModifier = speedModifier;
+						speedModifier = Math.min(250, speedModifier);
+						
+						setTickSpeed(speedModifier, sender);
 						String speed = String.format(Locale.ENGLISH, "%.2f", speedModifier);
 						String tick = String.format(Locale.ENGLISH, "%.1f", speedModifier * 20);
 						
@@ -81,7 +82,7 @@ public class CommandTick extends CommandBase {
 				}
 			}
 			case "reset" -> {
-				worldSpeedModifier = 1.0F;
+				setTickSpeed(1.0F, sender);
 				
 				sender.sendChatToPlayer(ChatMessageComponent.createFromTranslationKey("mot.reset"));
 			}
@@ -122,7 +123,7 @@ public class CommandTick extends CommandBase {
 					if (strings.length < 3) {
 						if (strings.length == 2) {
 							if (strings[1].equals("upSpeedKey")) {
-								float upSpeed = getUpSpeed(worldServer);
+								float upSpeed = upSpeedValue;
 								String speed = String.format("%.2f", upSpeed);
 								String tick = String.format("%.1f", upSpeed * 20);
 								
@@ -135,7 +136,7 @@ public class CommandTick extends CommandBase {
 								return;
 							}
 							else if (strings[1].equals("downSpeedKey")) {
-								float downSpeed = getDownSpeed(worldServer);
+								float downSpeed = downSpeedValue;
 								String speed = String.format("%.2f", downSpeed);
 								String tick = String.format("%.1f", downSpeed * 20);
 								
@@ -160,9 +161,9 @@ public class CommandTick extends CommandBase {
 							return;
 						}
 						
-						setIncreaseValue(worldServer, Math.min(250, Float.parseFloat(strings[2])));
+						float upSpeed = Math.min(250, Float.parseFloat(strings[2]));
+						setOptionFloatValue("upSpeedValue", upSpeed);
 						
-						float upSpeed = getUpSpeed(worldServer);
 						String speed = String.format("%.2f", upSpeed);
 						String tick = String.format("%.1f", upSpeed * 20);
 						
@@ -180,8 +181,9 @@ public class CommandTick extends CommandBase {
 							return;
 						}
 						
-						setDecreaseValue(worldServer, Math.max(0.01F, Float.parseFloat(strings[2])));
-						float downSpeed = getUpSpeed(worldServer);
+						float downSpeed = Math.max(0.01F, Float.parseFloat(strings[2]));
+						setOptionFloatValue("downSpeedValue", downSpeed);
+						
 						String speed = String.format("%.2f", downSpeed);
 						String tick = String.format("%.1f", downSpeed * 20);
 						
@@ -202,7 +204,7 @@ public class CommandTick extends CommandBase {
 					return;
 				}
 				
-				worldSpeedModifier = 0;
+				setTickSpeed(0, sender);
 			}
 			case "playeraffected" -> {
 				try {
